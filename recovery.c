@@ -658,8 +658,8 @@ wipe_data(int confirm) {
             title_headers = prepend_title((const char**)headers);
         }
 
-        char* items[] = { " 是的 -- 清空所有数据",   // [1]
-                          " 取消-返回",
+        char* items[] = { " 是的 - 清空所有数据",   // [1]
+                          " 取消 - 返回",
                           NULL };
 
         int chosen_item = get_menu_selection(title_headers, items, 1, 0);

@@ -183,7 +183,7 @@ try_update_binary(const char *path, ZipArchive *zip) {
     if (pid == 0) {
         close(pipefd[0]);
         execv(binary, args);
-        fprintf(stdout, "E:Can't run %s (%s)\n", binary, strerror(errno));
+        fprintf(stdout, "出错:无法运行 %s (%s)\n", binary, strerror(errno));
         _exit(-1);
     }
     close(pipefd[1]);
