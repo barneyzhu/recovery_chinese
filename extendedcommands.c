@@ -393,17 +393,8 @@ int confirm_selection(const char* title, const char* confirm)
     if (0 == stat("/sdcard/clockworkmod/.no_confirm", &info))
         return 1;
 
-    char* confirm_headers[]  = {  title, "  THIS CAN NOT BE UNDONE.", "", NULL };
-    char* items[] = { "No",
-                      "No",
-                      "No",
-                      "No",
-                      "No",
-                      "No",
-                      "No",
-                       confirm, //" Yes -- wipe partition",   // [7
-                      "No",
-                      "No",
+    char* confirm_headers[]  = {  title, "  注意:操作后将无法恢复.", "", NULL };
+    char* items[] = { confirm, //" Yes -- wipe partition",   // [7
                       "No",
                       NULL };
 
@@ -521,17 +512,17 @@ void show_partition_menu()
 			Volume* v = &device_volumes[i];
 			if(strcmp("ramdisk", v->fs_type) != 0 && strcmp("mtd", v->fs_type) != 0 && strcmp("emmc", v->fs_type) != 0 && strcmp("bml", v->fs_type) != 0)
 			{
-				sprintf(&mount_menue[mountable_volumes].mount, "mount %s", v->mount_point);
-				sprintf(&mount_menue[mountable_volumes].unmount, "unmount %s", v->mount_point);
+				sprintf(&mount_menue[mountable_volumes].mount, "挂载 %s", v->mount_point);
+				sprintf(&mount_menue[mountable_volumes].unmount, "卸载 %s", v->mount_point);
 				mount_menue[mountable_volumes].v = &device_volumes[i];
 				++mountable_volumes;
-				sprintf(&format_menue[formatable_volumes].txt, "format %s", v->mount_point);
+				sprintf(&format_menue[formatable_volumes].txt, "格式化 %s", v->mount_point);
 				format_menue[formatable_volumes].v = &device_volumes[i];
 				++formatable_volumes;
 		    }
 		    else if (strcmp("ramdisk", v->fs_type) != 0 && strcmp("misc", v->mount_point) != 0 && strcmp("mtd", v->fs_type) == 0)
 		    {
-				sprintf(&format_menue[formatable_volumes].txt, "format %s", v->mount_point);
+				sprintf(&format_menue[formatable_volumes].txt, "格式化 %s", v->mount_point);
 				format_menue[formatable_volumes].v = &device_volumes[i];
 				++formatable_volumes;
 			}
@@ -870,13 +861,13 @@ void show_advanced_menu()
                     break;
                 ensure_path_mounted("/sd-ext");
                 ensure_path_mounted("/cache");
-                if (confirm_selection( "Confirm wipe?", "Yes - Wipe Dalvik Cache")) {
+                if (confirm_selection( "确认清空?", "是的 - 清空Dalvik Cache")) {
                     __system("rm -r /data/dalvik-cache");
                     __system("rm -r /cache/dalvik-cache");
                     __system("rm -r /sd-ext/dalvik-cache");
                 }
                 ensure_path_unmounted("/data");
-                ui_print("Dalvik Cache wiped.\n");
+                ui_print("Dalvik Cache已清空.\n");
                 break;
             }
             case 2:
@@ -939,7 +930,7 @@ void show_advanced_menu()
                 char cmd[PATH_MAX];
                 setenv("SDPATH", sddevice, 1);
                 sprintf(cmd, "sdparted -es %s -ss %s -efs ext3 -s", ext_sizes[ext_size], swap_sizes[swap_size]);
-                ui_print("Partitioning SD Card... please wait...\n");
+                ui_print("SD卡分区中... 请等待...\n");
                 if (0 == __system(cmd))
                     ui_print("Done!\n");
                 else
