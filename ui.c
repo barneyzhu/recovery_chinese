@@ -510,7 +510,6 @@ int ui_start_menu(char** headers, char** items, int initial_selection) {
 
         if (gShowBackButton) {
             strcpy(menu[i], " - ---返回---");
-            ++i;
         }
 
         menu_items = i - menu_top;

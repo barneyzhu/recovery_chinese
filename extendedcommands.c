@@ -395,11 +395,11 @@ int confirm_selection(const char* title, const char* confirm)
 
     char* confirm_headers[]  = {  title, "  注意:操作后将无法恢复.", "", NULL };
     char* items[] = { confirm, //" Yes -- wipe partition",   // [7
-                      "No",
+                      "取消-返回",
                       NULL };
 
     int chosen_item = get_menu_selection(confirm_headers, items, 0, 0);
-    return chosen_item == 7;
+    return chosen_item == 0;
 }
 
 #define MKE2FS_BIN      "/sbin/mke2fs"
