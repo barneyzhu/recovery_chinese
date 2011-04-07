@@ -81,9 +81,9 @@ int nandroid_backup_partition_extended(const char* backup_path, const char* moun
         callback = yaffs_callback;
     }
     
-    ui_print("Backing up %s...\n", name);
+    ui_print("备份 %s...\n", name);
     if (0 != (ret = ensure_path_mounted(mount_point) != 0)) {
-        ui_print("Can't mount %s!\n", mount_point);
+        ui_print("不能挂载 %s!\n", mount_point);
         return ret;
     }
     compute_directory_stats(mount_point);
@@ -94,7 +94,7 @@ int nandroid_backup_partition_extended(const char* backup_path, const char* moun
         ensure_path_unmounted(mount_point);
     }
     if (0 != ret) {
-        ui_print("Error while making a yaffs2 image of %s!\n", mount_point);
+        ui_print("制作此备份文件时候出错 %s!\n", mount_point);
         return ret;
     }
     return 0;
@@ -114,9 +114,9 @@ int nandroid_backup_partition(const char* backup_path, const char* root) {
             strcmp(vol->fs_type, "emmc") == 0) {
         const char* name = basename(root);
         sprintf(tmp, "%s/%s.img", backup_path, name);
-        ui_print("Backing up %s image...\n", name);
+        ui_print("备份 %s 镜像...\n", name);
         if (0 != (ret = backup_raw_partition(vol->device, tmp))) {
-            ui_print("Error while backing up %s image!", name);
+            ui_print("制作此备份镜像文件时出错 %s !", name);
             return ret;
         }
         return 0;
@@ -140,9 +140,9 @@ int nandroid_backup(const char* backup_path)
     uint64_t bsize = s.f_bsize;
     uint64_t sdcard_free = bavail * bsize;
     uint64_t sdcard_free_mb = sdcard_free / (uint64_t)(1024 * 1024);
-    ui_print("SD Card space free: %lluMB\n", sdcard_free_mb);
+    ui_print("SD卡剩余空间: %lluMB\n", sdcard_free_mb);
     if (sdcard_free_mb < 150)
-        ui_print("There may not be enough free space to complete backup... continuing...\n");
+        ui_print("可能没有足够的空间完成备份... 继续...\n");
     
     char tmp[PATH_MAX];
     sprintf(tmp, "mkdir -p %s", backup_path);
@@ -180,7 +180,7 @@ int nandroid_backup(const char* backup_path)
 
     if (0 != stat("/sdcard/.android_secure", &s))
     {
-        ui_print("No /sdcard/.android_secure found. Skipping backup of applications on external storage.\n");
+        ui_print("没有发现 /sdcard/.android_secure. 放弃备份SD卡上安装的程序.\n");
     }
     else
     {
@@ -194,27 +194,27 @@ int nandroid_backup(const char* backup_path)
     vol = volume_for_path("/sd-ext");
     if (vol == NULL || 0 != stat(vol->device, &s))
     {
-        ui_print("No sd-ext found. Skipping backup of sd-ext.\n");
+        ui_print("没有发现sd-ext. 放弃备份sd-ext.\n");
     }
     else
     {
         if (0 != ensure_path_mounted("/sd-ext"))
-            ui_print("Could not mount sd-ext. sd-ext backup may not be supported on this device. Skipping backup of sd-ext.\n");
+            ui_print("不能挂载sd-ext. sd-ext备份可能不支持此设备. 放弃备份sd-ext.\n");
         else if (0 != (ret = nandroid_backup_partition(backup_path, "/sd-ext")))
             return ret;
     }
 
-    ui_print("Generating md5 sum...\n");
+    ui_print("生成md5校验...\n");
     sprintf(tmp, "nandroid-md5.sh %s", backup_path);
     if (0 != (ret = __system(tmp))) {
-        ui_print("Error while generating md5 sum!\n");
+        ui_print("生成md5时出错!\n");
         return ret;
     }
     
     sync();
     ui_set_background(BACKGROUND_ICON_NONE);
     ui_reset_progress();
-    ui_print("\nBackup complete!\n");
+    ui_print("\n备份完成!\n");
     return 0;
 }
 
@@ -234,7 +234,7 @@ int nandroid_restore_partition_extended(const char* backup_path, const char* mou
     sprintf(tmp, "%s/%s.img", backup_path, name);
     struct stat file_info;
     if (0 != (ret = statfs(tmp, &file_info))) {
-        ui_print("%s.img not found. Skipping restore of %s.\n", name, mount_point);
+        ui_print("%s.img没有发现. 放弃还原 %s.\n", name, mount_point);
         return 0;
     }
 
@@ -245,7 +245,7 @@ int nandroid_restore_partition_extended(const char* backup_path, const char* mou
         callback = yaffs_callback;
     }
 
-    ui_print("Restoring %s...\n", name);
+    ui_print("还原 %s...\n", name);
     /*
     if (0 != (ret = ensure_root_path_unmounted(root))) {
         ui_print("Can't unmount %s!\n", mount_point);
@@ -253,17 +253,17 @@ int nandroid_restore_partition_extended(const char* backup_path, const char* mou
     }
     */
     if (0 != (ret = format_volume(mount_point))) {
-        ui_print("Error while formatting %s!\n", mount_point);
+        ui_print("格式化时出错 %s!\n", mount_point);
         return ret;
     }
     
     if (0 != (ret = ensure_path_mounted(mount_point))) {
-        ui_print("Can't mount %s!\n", mount_point);
+        ui_print("不能挂载 %s!\n", mount_point);
         return ret;
     }
     
     if (0 != (ret = unyaffs(tmp, mount_point, callback))) {
-        ui_print("Error while restoring %s!\n", mount_point);
+        ui_print("还原时出错 %s!\n", mount_point);
         return ret;
     }
 
@@ -287,15 +287,15 @@ int nandroid_restore_partition(const char* backup_path, const char* root) {
             strcmp(vol->fs_type, "emmc") == 0) {
         int ret;
         const char* name = basename(root);
-        ui_print("Erasing %s before restore...\n", name);
+        ui_print("还原前擦除 %s ...\n", name);
         if (0 != (ret = format_volume(root))) {
-            ui_print("Error while erasing %s image!", name);
+            ui_print("擦除 %s 出错!", name);
             return ret;
         }
         sprintf(tmp, "%s%s.img", backup_path, root);
-        ui_print("Restoring %s image...\n", name);
+        ui_print("还原 %s 镜像...\n", name);
         if (0 != (ret = restore_raw_partition(vol->device, tmp))) {
-            ui_print("Error while flashing %s image!", name);
+            ui_print("写入 %s 出错!", name);
             return ret;
         }
         return 0;
@@ -314,10 +314,10 @@ int nandroid_restore(const char* backup_path, int restore_boot, int restore_syst
     
     char tmp[PATH_MAX];
 
-    ui_print("Checking MD5 sums...\n");
+    ui_print("检查MD5校验...\n");
     sprintf(tmp, "cd %s && md5sum -c nandroid.md5", backup_path);
     if (0 != __system(tmp))
-        return print_and_error("MD5 mismatch!\n");
+        return print_and_error("MD5不匹配!\n");
     
     int ret;
 
@@ -376,7 +376,7 @@ int nandroid_restore(const char* backup_path, int restore_boot, int restore_syst
     sync();
     ui_set_background(BACKGROUND_ICON_NONE);
     ui_reset_progress();
-    ui_print("\nRestore complete!\n");
+    ui_print("\n还原完成!\n");
     return 0;
 }
 
